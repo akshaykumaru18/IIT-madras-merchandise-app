@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:iit_madras_merchandise/Screens/ProductCatalog.dart';
 class CreateProfilePage extends StatefulWidget {
   const CreateProfilePage({Key key}) : super(key: key);
 
@@ -192,18 +194,26 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                             createProfileKey.currentState.save();
                             if(createProfileKey.currentState.validate()){
                               // 
+                               FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+                              String email = FirebaseAuth.instance.currentUser.email;
                               debugPrint('Successfully Form validated');
                               var uData = {
                                 "name": name,
                                 "phone": phoneNumber,
                                 "address": address,
                                 "state": state,
+                                "email": email
                               };
-                              FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+                             
                               await firebaseFirestore
                               .collection('Users')
-                              .add(uData);
+                              .doc(email)
+                              .set(uData);
                               print('Data added');
+                               Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => ProductCatalog()));
                             }else{
                               debugPrint('Please fill the form again');
                             }

@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import "package:flutter/material.dart";
 import 'package:iit_madras_merchandise/Screens/CreateProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:iit_madras_merchandise/Screens/ProductCatalog.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key key}) : super(key: key);
@@ -64,15 +67,45 @@ class _AuthPageState extends State<AuthPage> {
                         if (signedAccount != null) {
                           print('Authentication Success');
                           print('Signed In from ${signedAccount.email}');
-                           GoogleSignInAuthentication gauth = await signedAccount.authentication;
-                          final AuthCredential credential = GoogleAuthProvider.credential(
+                          GoogleSignInAuthentication gauth =
+                              await signedAccount.authentication;
+                          final AuthCredential credential =
+                              GoogleAuthProvider.credential(
                             accessToken: gauth.accessToken,
                             idToken: gauth.idToken,
                           );
-                          UserCredential login = await auth.signInWithCredential(credential);
-                          if(login.user != null){
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> CreateProfilePage()));
-                          }else{
+                          UserCredential login =
+                              await auth.signInWithCredential(credential);
+                          if (login.user != null) {
+                            //TODO : 1) Query the user with Firebase and check if profile exists in USER COllection
+                            //IF yes then route to Product Catalog Page
+                            //Else Route to Create Profile Page
+
+                            //QUERY
+                            FirebaseAuth auth = FirebaseAuth.instance;
+                            FirebaseFirestore firestore =
+                                FirebaseFirestore.instance;
+                            await firestore
+                                .collection('Users')
+                                .where('email',
+                                    isEqualTo: auth.currentUser.email)
+                                .get()
+                                .then((value) {
+                              debugPrint('Docs Length ' +
+                                  value.docs.length.toString());
+                              if (value.docs.length == 0) {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => CreateProfilePage()));
+                              } else {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => ProductCatalog()));
+                              }
+                            }).onError((error, stackTrace) {});
+                          } else {
                             await googleSignIn.signOut();
                             await auth.signOut();
                           }
