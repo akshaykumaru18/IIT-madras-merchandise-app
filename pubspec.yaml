@@ -28,6 +28,7 @@ dependencies:
   google_sign_in: ^5.0.0
   cloud_firestore: ^3.1.5
   provider:
+  razorpay_flutter: ^1.2.7
 
 
   # The following adds the Cupertino Icons font to your application.

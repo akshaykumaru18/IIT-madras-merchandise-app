@@ -19,6 +19,35 @@ class _AuthPageState extends State<AuthPage> {
   GoogleSignInAccount signedAccount;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkLogin();
+  }
+
+  void checkLogin() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    if(auth.currentUser != null){
+
+    }
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    await firestore
+        .collection('Users')
+        .where('email', isEqualTo: auth.currentUser.email)
+        .get()
+        .then((value) {
+      debugPrint('Docs Length ' + value.docs.length.toString());
+      if (value.docs.length == 0) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => CreateProfilePage()));
+      } else {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => ProductCatalog()));
+      }
+    }).onError((error, stackTrace) {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff79201B),

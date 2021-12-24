@@ -24,7 +24,12 @@ class StoreProvider extends ChangeNotifier {
     .collection('Products')
     .get().then((value) {
         value.docs.forEach((doc) {
-            Product product = new Product(doc['name'],doc['description'],doc['image'],double.parse(doc['price'].toString()));
+            Product product = new Product(
+              doc['name'],
+              doc['description'],
+              doc['image'],
+              double.parse(doc['price'].toString()),
+              featured: doc['featured']);
             products.add(product);
         });
     });
@@ -41,6 +46,10 @@ class StoreProvider extends ChangeNotifier {
      
     });
     
+  }
+
+  Future<void> purchase() async {
+    //Payment Logic
   }
 }
 
